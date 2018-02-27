@@ -1,51 +1,41 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import PlaceInput from "./src/components/PlaceInput/PlaceInput";
+import PlaceList from "./src/components/PlaceList/PlaceList";
 
 export default class App extends React.Component {
   state = {
-    placeName: "",
     places: []
   }
 
-  placeNameChangedHandler = (value) => {
-    this.setState({ placeName: value })
-  }
-
-  placeSubmitHandler = () => {
-    if (this.state.placeName.trim() === "") {
-      return;
-    }
+  placeAddedHandler = placeName => {
     this.setState(prevState => {
       return {
-        places: prevState.places.concat(prevState.placeName)
+        places: prevState.places.concat(placeName)
+      };
+    })
+  };
+
+  placeDeletedHandler = index => {
+    this.setState(prevState => {
+      return {
+        places: prevState.places.filter((place, i) => {
+          return i !== index;
+        })
       };
     });
-  }
+  };
 
   render() {
 
     const placesOutput = this.state.places.map((place, i) => (
-      <Text key={i}>{place}</Text>
+      <ListItem key={i} placeName={place} />
     ));
 
     return (
       <View style={styles.container}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            value={this.state.placeName}
-            onChangeText={this.placeNameChangedHandler}
-            placeholder="An awesome place"
-            style={styles.placeInput}
-          />
-          <Button
-            title="Add"
-            style={styles.placeButton}
-            onPress={this.placeSubmitHandler}
-          />
-        </View>
-        <View>
-          {placesOutput}
-        </View>
+        <PlaceInput onPlaceAdded={this.placeAddedHandler} />
+        <PlaceList places={this.state.places} onItemDeleted={this.placeDeletedHandler} />
       </View>
     );
   }
@@ -58,18 +48,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     padding: 26
-  },
-  inputContainer: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%"
-  },
-  placeInput: {
-    width: "70%",
-    padding: 12
-  },
-  placeButton: {
-    width: "30%"
   }
 });
